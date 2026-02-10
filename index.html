@@ -34,8 +34,6 @@
       });
     }
   </script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script>
     // Manifest
@@ -68,10 +66,6 @@
     #root { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .pwa-banner { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, #ff6400, #cc5000); border-top: 3px solid #ff8833; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); z-index: 9999; animation: slideUp 0.3s; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .map-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; }
-    .map-container { flex: 1; position: relative; }
-    .map-header { background: #1a1410; border-bottom: 3px solid #ff6400; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .leaflet-container { height: 100%; width: 100%; }
   </style>
 </head>
 <body>
@@ -127,14 +121,6 @@
     );
     
     
-    
-    const MapPin = ({ size = 24 }) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-        <circle cx="12" cy="10" r="3"></circle>
-      </svg>
-    );
-
     const Download = ({ size = 24 }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -143,146 +129,6 @@
       </svg>
     );
     
-    
-    function LocationPicker({ onSelect, onClose, initialLocation }) {
-      const mapRef = React.useRef(null);
-      const [selectedPos, setSelectedPos] = React.useState(initialLocation || null);
-      
-      React.useEffect(() => {
-        if (!mapRef.current) {
-          const center = initialLocation || { lat: 40.7128, lng: -74.0060 };
-          const map = L.map('location-picker-map').setView([center.lat, center.lng], 13);
-          
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-          }).addTo(map);
-          
-          const marker = L.marker([center.lat, center.lng], { draggable: true }).addTo(map);
-          
-          marker.on('dragend', function(e) {
-            const pos = e.target.getLatLng();
-            setSelectedPos({ lat: pos.lat, lng: pos.lng });
-          });
-          
-          map.on('click', function(e) {
-            marker.setLatLng(e.latlng);
-            setSelectedPos({ lat: e.latlng.lat, lng: e.latlng.lng });
-          });
-          
-          mapRef.current = map;
-          setSelectedPos(center);
-        }
-        
-        return () => {
-          if (mapRef.current) {
-            mapRef.current.remove();
-            mapRef.current = null;
-          }
-        };
-      }, []);
-      
-      return (
-        <div className="map-modal">
-          <div className="map-header">
-            <h2 style={{ margin: 0, color: '#ff6400', fontSize: '24px', textTransform: 'uppercase' }}>
-              <MapPin size={24} style={{ verticalAlign: 'middle', marginRight: '10px' }} />
-              Select Location
-            </h2>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => onSelect(selectedPos)} style={{ padding: '10px 20px', background: '#ff6400', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontFamily: 'Impact', fontSize: '16px' }}>CONFIRM</button>
-              <button onClick={onClose} style={{ padding: '10px 20px', background: 'transparent', border: '2px solid #666', borderRadius: '6px', color: '#999', cursor: 'pointer', fontFamily: 'Impact', fontSize: '16px' }}>CANCEL</button>
-            </div>
-          </div>
-          <div className="map-container">
-            <div id="location-picker-map" style={{ height: '100%', width: '100%' }}></div>
-          </div>
-          <div style={{ background: '#1a1410', borderTop: '2px solid #333', padding: '15px 20px', color: '#aaa', fontFamily: 'Arial', fontSize: '14px', textAlign: 'center' }}>
-            Tap the map or drag the pin to select a location
-          </div>
-        </div>
-      );
-    }
-    
-    function MapView({ tasks, onClose, userLocation }) {
-      const mapRef = React.useRef(null);
-      
-      React.useEffect(() => {
-        if (!mapRef.current && tasks.length > 0) {
-          const tasksWithLocation = tasks.filter(t => t.location);
-          const center = userLocation || (tasksWithLocation[0]?.location) || { lat: 40.7128, lng: -74.0060 };
-          
-          const map = L.map('map-view').setView([center.lat, center.lng], 12);
-          
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-          }).addTo(map);
-          
-          // Add user location
-          if (userLocation) {
-            L.circleMarker([userLocation.lat, userLocation.lng], {
-              radius: 8,
-              fillColor: '#3b82f6',
-              color: '#fff',
-              weight: 2,
-              fillOpacity: 0.9
-            }).addTo(map).bindPopup('<b>Your Location</b>');
-          }
-          
-          // Add task markers
-          tasksWithLocation.forEach(task => {
-            const timeLeft = task.deadline - Date.now();
-            let color = '#3b82f6';
-            if (timeLeft <= 3600000) color = '#ef4444';
-            else if (timeLeft <= 14400000) color = '#f59e0b';
-            else if (timeLeft <= 86400000) color = '#eab308';
-            else if (timeLeft <= 604800000) color = '#22c55e';
-            
-            const isActive = !task.showTime || Date.now() >= task.showTime;
-            
-            if (isActive) {
-              L.circleMarker([task.location.lat, task.location.lng], {
-                radius: 10,
-                fillColor: color,
-                color: '#fff',
-                weight: 2,
-                fillOpacity: 0.8
-              }).addTo(map).bindPopup(`<b>${task.name}</b><br>Deadline: ${new Date(task.deadline).toLocaleString()}`);
-            }
-          });
-          
-          mapRef.current = map;
-        }
-        
-        return () => {
-          if (mapRef.current) {
-            mapRef.current.remove();
-            mapRef.current = null;
-          }
-        };
-      }, [tasks, userLocation]);
-      
-      return (
-        <div className="map-modal">
-          <div className="map-header">
-            <h2 style={{ margin: 0, color: '#ff6400', fontSize: '24px', textTransform: 'uppercase' }}>
-              <MapPin size={24} style={{ verticalAlign: 'middle', marginRight: '10px' }} />
-              Mission Map
-            </h2>
-            <button onClick={onClose} style={{ padding: '10px 20px', background: 'transparent', border: '2px solid #666', borderRadius: '6px', color: '#999', cursor: 'pointer', fontFamily: 'Impact', fontSize: '16px' }}>CLOSE</button>
-          </div>
-          <div className="map-container">
-            <div id="map-view" style={{ height: '100%', width: '100%' }}></div>
-          </div>
-          <div style={{ background: '#1a1410', borderTop: '2px solid #333', padding: '15px 20px', display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#3b82f6' }}></div><span style={{ color: '#aaa', fontSize: '12px' }}>Your Location</span></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e' }}></div><span style={{ color: '#aaa', fontSize: '12px' }}>&gt;1 Day</span></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308' }}></div><span style={{ color: '#aaa', fontSize: '12px' }}>&lt;1 Day</span></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }}></div><span style={{ color: '#aaa', fontSize: '12px' }}>&lt;4 Hours</span></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }}></div><span style={{ color: '#aaa', fontSize: '12px' }}>&lt;1 Hour</span></div>
-          </div>
-        </div>
-      );
-    }
     function InstallBanner({ onInstall, onDismiss }) {
       return (
         <div className="pwa-banner">
@@ -298,31 +144,6 @@
             <button onClick={onDismiss} style={{ padding: '10px 18px', background: 'transparent', border: '2px solid rgba(255,255,255,0.6)', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontFamily: 'Impact', fontSize: '15px' }}>LATER</button>
           </div>
           
-          {/* Location Picker Modal */}
-          {showLocationPicker && (
-            <LocationPicker
-              initialLocation={taskLocation || userLocation}
-              onSelect={(location) => {
-                setTaskLocation(location);
-                setShowLocationPicker(false);
-              }}
-              onClose={() => {
-                setShowLocationPicker(false);
-                if (!taskLocation) setHasLocation(false);
-              }}
-            />
-          )}
-          
-          {/* Map View Modal */}
-          {showMapView && (
-            <MapView
-              tasks={tasks}
-              userLocation={userLocation}
-              onClose={() => setShowMapView(false)}
-            />
-          )}
-          
-          {/* Install Prompt */}
           {showInstallBanner && (
             <InstallBanner onInstall={handleInstall} onDismiss={handleDismiss} />
           )}
@@ -358,11 +179,6 @@
       const [editMode, setEditMode] = useState('datetime');
       const [deferredPrompt, setDeferredPrompt] = useState(null);
       const [showInstallBanner, setShowInstallBanner] = useState(false);
-      const [hasLocation, setHasLocation] = useState(false);
-      const [taskLocation, setTaskLocation] = useState(null);
-      const [showLocationPicker, setShowLocationPicker] = useState(false);
-      const [showMapView, setShowMapView] = useState(false);
-      const [userLocation, setUserLocation] = useState(null);
 
 
       // PWA install prompt
@@ -387,25 +203,6 @@
         setDeferredPrompt(null);
         setShowInstallBanner(false);
       };
-
-
-      // Get user location
-      useEffect(() => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setUserLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              });
-            },
-            () => {
-              // Default to a central location if denied
-              setUserLocation({ lat: 40.7128, lng: -74.0060 }); // NYC
-            }
-          );
-        }
-      }, []);
 
       const handleDismiss = () => {
         setShowInstallBanner(false);
@@ -750,32 +547,6 @@
               }}>
                 ACTIVE MISSIONS
               </h1>
-              {tasks.filter(t => t.location).length > 0 && (
-                <button
-                  onClick={() => setShowMapView(true)}
-                  style={{
-                    marginTop: '15px',
-                    padding: '12px 24px',
-                    background: '#3b82f6',
-                    border: '3px solid #60a5fa',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    margin: '15px auto 0',
-                    boxShadow: '0 4px 0 #2563eb'
-                  }}
-                >
-                  <MapPin size={20} />
-                  View Map ({tasks.filter(t => t.location && (!t.showTime || Date.now() >= t.showTime)).length})
-                </button>
-              )}
             </div>
 
             {/* Add Task Form */}
@@ -1283,7 +1054,6 @@
                           }}>
                             {isActive && isExpired && <AlertTriangle size={20} style={{ color: '#ff0000' }} />}
                             {task.recurring && <Repeat size={18} style={{ color: isActive ? '#4ade80' : '#444' }} />}
-                            {task.location && <MapPin size={18} style={{ color: isActive ? '#3b82f6' : '#444' }} />}
                             {task.name}
                           </h3>
                           {!isActive && timeUntilActive && (
@@ -1642,31 +1412,6 @@
             </div>
           </div>
           
-          {/* Location Picker Modal */}
-          {showLocationPicker && (
-            <LocationPicker
-              initialLocation={taskLocation || userLocation}
-              onSelect={(location) => {
-                setTaskLocation(location);
-                setShowLocationPicker(false);
-              }}
-              onClose={() => {
-                setShowLocationPicker(false);
-                if (!taskLocation) setHasLocation(false);
-              }}
-            />
-          )}
-          
-          {/* Map View Modal */}
-          {showMapView && (
-            <MapView
-              tasks={tasks}
-              userLocation={userLocation}
-              onClose={() => setShowMapView(false)}
-            />
-          )}
-          
-          {/* Install Prompt */}
           {showInstallBanner && (
             <InstallBanner onInstall={handleInstall} onDismiss={handleDismiss} />
           )}
