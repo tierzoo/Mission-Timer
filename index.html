@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1410">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Missions">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231a1410' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%23ff6400' stroke-width='4'/%3E%3Cpath d='M50 25V50L65 57' stroke='%23ff6400' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%231a1410' width='180' height='180'/%3E%3Ccircle cx='90' cy='90' r='60' fill='none' stroke='%23ff6400' stroke-width='7'/%3E%3Cpath d='M90 45V90L120 105' stroke='%23ff6400' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="manifest" id="manifest-link">
+  <title>Mission Timer</title>
+  <script>
+    // Manifest
+    const manifest = {
+      name: "Mission Timer",
+      short_name: "Missions",
+      description: "Dead Rising style mission timer",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#1a1410",
+      theme_color: "#1a1410",
+      icons: [{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%231a1410' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='70' fill='none' stroke='%23ff6400' stroke-width='8'/%3E%3Cpath d='M96 50V96L130 110' stroke='%23ff6400' stroke-width='8' stroke-linecap='round'/%3E%3Ccircle cx='96' cy='96' r='8' fill='%23ff6400'/%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%231a1410' width='512' height='512'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%23ff6400' stroke-width='20'/%3E%3Cpath d='M256 100V256L350 300' stroke='%23ff6400' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%23ff6400'/%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
+    };
+    document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:'application/json'}));
+    
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const sw = 'self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.claim()));';
+        navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+      });
+    }
+  </script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script>
+    // Manifest
+    const manifest = {
+      name: "Mission Timer",
+      short_name: "Missions",
+      description: "Dead Rising style mission timer",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#1a1410",
+      theme_color: "#1a1410",
+      icons: [{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%231a1410' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='70' fill='none' stroke='%23ff6400' stroke-width='8'/%3E%3Cpath d='M96 50V96L130 110' stroke='%23ff6400' stroke-width='8' stroke-linecap='round'/%3E%3Ccircle cx='96' cy='96' r='8' fill='%23ff6400'/%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%231a1410' width='512' height='512'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%23ff6400' stroke-width='20'/%3E%3Cpath d='M256 100V256L350 300' stroke='%23ff6400' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%23ff6400'/%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
+    };
+    document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:'application/json'}));
+    
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const sw = 'self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.claim()));';
+        navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+      });
+    }
+  </script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    input, textarea, select, button { -webkit-user-select: text; user-select: text; }
+    body { margin: 0; padding: 0; font-family: 'Impact', 'Arial Black', sans-serif; overflow: hidden; position: fixed; width: 100%; height: 100%; }
+    #root { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .pwa-banner { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, #ff6400, #cc5000); border-top: 3px solid #ff8833; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); z-index: 9999; animation: slideUp 0.3s; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    // Lucide React icons as inline SVG components
+    const Clock = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    );
+    
+    const Plus = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    );
+    
+    const X = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    );
+    
+    const AlertTriangle = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    );
+    
+    const CheckCircle = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    );
+    
+    const Repeat = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <polyline points="17 1 21 5 17 9"></polyline>
+        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+        <polyline points="7 23 3 19 7 15"></polyline>
+        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+      </svg>
+    );
+    
+    
+    const Download = ({ size = 24 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+    );
+    
+    function InstallBanner({ onInstall, onDismiss }) {
+      return (
+        <div className="pwa-banner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+            <Download size={28} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#fff', textTransform: 'uppercase', marginBottom: '4px' }}>Install App</div>
+              <div style={{ fontSize: '13px', color: '#ffe', fontFamily: 'Arial' }}>Get the full experience</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={onInstall} style={{ flex: 1, padding: '10px', background: '#fff', border: 'none', borderRadius: '6px', color: '#ff6400', cursor: 'pointer', fontFamily: 'Impact', fontSize: '15px', fontWeight: 'bold' }}>INSTALL</button>
+            <button onClick={onDismiss} style={{ padding: '10px 18px', background: 'transparent', border: '2px solid rgba(255,255,255,0.6)', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontFamily: 'Impact', fontSize: '15px' }}>LATER</button>
+          </div>
+          
+          {showInstallBanner && (
+            <InstallBanner onInstall={handleInstall} onDismiss={handleDismiss} />
+          )}
+        </div>
+      );
+    }
+
+    const Edit2 = ({ size = 24, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+      </svg>
+    );
+
+    function DeadRisingTodo() {
+      const [tasks, setTasks] = useState([]);
+      const [newTaskName, setNewTaskName] = useState('');
+      const [newTaskHours, setNewTaskHours] = useState('');
+      const [newTaskMinutes, setNewTaskMinutes] = useState('');
+      const [newTaskDate, setNewTaskDate] = useState('');
+      const [newTaskTime, setNewTaskTime] = useState('');
+      const [inputMode, setInputMode] = useState('datetime');
+      const [isRecurring, setIsRecurring] = useState(false);
+      const [recurringType, setRecurringType] = useState('weekly');
+      const [recurringDay, setRecurringDay] = useState('1');
+      const [leadTimeHours, setLeadTimeHours] = useState('4');
+      const [currentTime, setCurrentTime] = useState(Date.now());
+      const [isLoaded, setIsLoaded] = useState(false);
+      const [editingTaskId, setEditingTaskId] = useState(null);
+      const [editDate, setEditDate] = useState('');
+      const [editTime, setEditTime] = useState('');
+      const [editHours, setEditHours] = useState('');
+      const [editMinutes, setEditMinutes] = useState('');
+      const [editMode, setEditMode] = useState('datetime');
+      const [deferredPrompt, setDeferredPrompt] = useState(null);
+      const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+
+      // PWA install prompt
+      useEffect(() => {
+        const handler = (e) => {
+          e.preventDefault();
+          setDeferredPrompt(e);
+          setTimeout(() => {
+            if (!localStorage.getItem('install-dismissed')) {
+              setShowInstallBanner(true);
+            }
+          }, 2000);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+      }, []);
+
+      const handleInstall = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        setDeferredPrompt(null);
+        setShowInstallBanner(false);
+      };
+
+      const handleDismiss = () => {
+        setShowInstallBanner(false);
+        localStorage.setItem('install-dismissed', 'true');
+      };
+
+      const flashingStyle = `
+        @keyframes flash {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      `;
+
+      // Load tasks from localStorage on mount
+      useEffect(() => {
+        try {
+          const savedTasks = localStorage.getItem('dead-rising-tasks');
+          if (savedTasks) {
+            const parsedTasks = JSON.parse(savedTasks);
+            const updatedTasks = parsedTasks.map(task => {
+              if (!task.showTime) {
+                return { ...task, showTime: Date.now() };
+              }
+              return task;
+            });
+            setTasks(updatedTasks);
+          }
+        } catch (error) {
+          console.log('No saved tasks found');
+        }
+        setIsLoaded(true);
+      }, []);
+
+      // Save tasks to localStorage whenever they change
+      useEffect(() => {
+        if (isLoaded) {
+          localStorage.setItem('dead-rising-tasks', JSON.stringify(tasks));
+        }
+      }, [tasks, isLoaded]);
+
+      // Update current time every second
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setCurrentTime(Date.now());
+        }, 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+      const addTask = () => {
+        if (!newTaskName.trim()) return;
+        
+        let deadline;
+        let totalTime;
+        let showTime;
+        
+        if (inputMode === 'datetime') {
+          let dateToUse = newTaskDate;
+          let timeToUse = newTaskTime;
+          
+          if (newTaskTime && !newTaskDate) {
+            const now = new Date();
+            const [hours, minutes] = newTaskTime.split(':').map(Number);
+            const todayWithTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+            
+            if (todayWithTime <= now) {
+              const tomorrow = new Date(now);
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              const year = tomorrow.getFullYear();
+              const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+              const day = String(tomorrow.getDate()).padStart(2, '0');
+              dateToUse = `${year}-${month}-${day}`;
+            } else {
+              const year = now.getFullYear();
+              const month = String(now.getMonth() + 1).padStart(2, '0');
+              const day = String(now.getDate()).padStart(2, '0');
+              dateToUse = `${year}-${month}-${day}`;
+            }
+          }
+          
+          if (newTaskDate && !newTaskTime) {
+            timeToUse = '23:59';
+          }
+          
+          if (!dateToUse || !timeToUse) return;
+          
+          const dateTimeString = `${dateToUse}T${timeToUse}`;
+          deadline = new Date(dateTimeString).getTime();
+          
+          if (isRecurring) {
+            const leadTime = parseInt(leadTimeHours) * 60 * 60 * 1000;
+            showTime = deadline - leadTime;
+            totalTime = leadTime;
+            
+            if (showTime < Date.now()) {
+              const nextDeadline = calculateNextDeadline(deadline, {
+                type: recurringType,
+                day: recurringType === 'weekly' ? parseInt(recurringDay) : null
+              });
+              deadline = nextDeadline;
+              showTime = nextDeadline - leadTime;
+              totalTime = leadTime;
+            }
+          } else {
+            totalTime = deadline - Date.now();
+            showTime = Date.now();
+          }
+          
+          if (totalTime <= 0) return;
+        } else {
+          const hours = parseInt(newTaskHours) || 0;
+          const minutes = parseInt(newTaskMinutes) || 0;
+          
+          if (hours === 0 && minutes === 0) return;
+          
+          totalTime = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+          deadline = Date.now() + totalTime;
+          showTime = Date.now();
+        }
+        
+        const newTask = {
+          id: Date.now(),
+          name: newTaskName,
+          deadline,
+          totalTime,
+          showTime
+        };
+        
+        if (isRecurring) {
+          newTask.recurring = {
+            type: recurringType,
+            day: recurringType === 'weekly' ? parseInt(recurringDay) : null,
+            leadTimeHours: parseInt(leadTimeHours)
+          };
+        }
+        
+        setTasks([...tasks, newTask]);
+        
+        setNewTaskName('');
+        setNewTaskHours('');
+        setNewTaskMinutes('');
+        setNewTaskDate('');
+        setNewTaskTime('');
+        setIsRecurring(false);
+      };
+
+      const removeTask = (id) => {
+        setTasks(tasks.filter(task => task.id !== id));
+      };
+
+      const startEditingTask = (task) => {
+        setEditingTaskId(task.id);
+        const deadline = new Date(task.deadline);
+        
+        const year = deadline.getFullYear();
+        const month = String(deadline.getMonth() + 1).padStart(2, '0');
+        const day = String(deadline.getDate()).padStart(2, '0');
+        const hours = String(deadline.getHours()).padStart(2, '0');
+        const minutes = String(deadline.getMinutes()).padStart(2, '0');
+        
+        setEditDate(`${year}-${month}-${day}`);
+        setEditTime(`${hours}:${minutes}`);
+        setEditMode('datetime');
+      };
+
+      const saveTaskEdit = (taskId) => {
+        const task = tasks.find(t => t.id === taskId);
+        if (!task) return;
+        
+        let newDeadline;
+        
+        if (editMode === 'datetime') {
+          if (!editDate || !editTime) return;
+          const dateTimeString = `${editDate}T${editTime}`;
+          newDeadline = new Date(dateTimeString).getTime();
+        } else {
+          const hours = parseInt(editHours) || 0;
+          const minutes = parseInt(editMinutes) || 0;
+          if (hours === 0 && minutes === 0) return;
+          newDeadline = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+        }
+        
+        setTasks(tasks.map(t => {
+          if (t.id === taskId) {
+            const updatedTask = { ...t, deadline: newDeadline };
+            
+            if (t.recurring && t.recurring.leadTimeHours) {
+              const leadTime = t.recurring.leadTimeHours * 60 * 60 * 1000;
+              updatedTask.showTime = newDeadline - leadTime;
+              updatedTask.totalTime = leadTime;
+            } else {
+              updatedTask.totalTime = newDeadline - Date.now();
+            }
+            
+            return updatedTask;
+          }
+          return t;
+        }));
+        
+        setEditingTaskId(null);
+        setEditDate('');
+        setEditTime('');
+        setEditHours('');
+        setEditMinutes('');
+      };
+
+      const cancelTaskEdit = () => {
+        setEditingTaskId(null);
+        setEditDate('');
+        setEditTime('');
+        setEditHours('');
+        setEditMinutes('');
+      };
+
+      const completeRecurringTask = (task) => {
+        setTasks(tasks.filter(t => t.id !== task.id));
+        
+        const nextDeadline = calculateNextDeadline(task.deadline, task.recurring);
+        const leadTime = task.recurring.leadTimeHours * 60 * 60 * 1000;
+        const nextShowTime = nextDeadline - leadTime;
+        const newTotalTime = leadTime;
+        
+        setTasks(prev => [...prev, {
+          id: Date.now(),
+          name: task.name,
+          deadline: nextDeadline,
+          totalTime: newTotalTime,
+          showTime: nextShowTime,
+          recurring: task.recurring
+        }]);
+      };
+
+      const calculateNextDeadline = (currentDeadline, recurring) => {
+        const deadline = new Date(currentDeadline);
+        
+        switch (recurring.type) {
+          case 'daily':
+            deadline.setDate(deadline.getDate() + 1);
+            break;
+          case 'weekly':
+            deadline.setDate(deadline.getDate() + 7);
+            break;
+          case 'monthly':
+            deadline.setMonth(deadline.getMonth() + 1);
+            break;
+        }
+        
+        return deadline.getTime();
+      };
+
+      const getTimeRemaining = (deadline) => {
+        const remaining = deadline - currentTime;
+        if (remaining <= 0) return { hours: 0, minutes: 0, seconds: 0, total: 0 };
+        
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        
+        return { hours, minutes, seconds, total: remaining };
+      };
+
+      const getBarColor = (remaining) => {
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        const oneDay = 24 * 60 * 60 * 1000;
+        const fourHours = 4 * 60 * 60 * 1000;
+        const oneHour = 60 * 60 * 1000;
+        
+        const blueHue = 210;
+        const greenHue = 140;
+        const yellowHue = 50;
+        const redHue = 0;
+        const pinkHue = 330;
+        
+        let hue;
+        
+        if (remaining > oneWeek) {
+          hue = blueHue;
+        } else if (remaining > oneDay) {
+          const progress = (oneWeek - remaining) / (oneWeek - oneDay);
+          hue = blueHue + (greenHue - blueHue) * progress;
+        } else if (remaining > fourHours) {
+          const progress = (oneDay - remaining) / (oneDay - fourHours);
+          hue = greenHue + (yellowHue - greenHue) * progress;
+        } else if (remaining > oneHour) {
+          const progress = (fourHours - remaining) / (fourHours - oneHour);
+          hue = yellowHue + (redHue - yellowHue) * progress;
+        } else {
+          const progress = Math.min(1, (oneHour - remaining) / oneHour);
+          hue = redHue + (360 - pinkHue) * progress + pinkHue;
+          if (hue > 360) hue -= 360;
+        }
+        
+        return `hsl(${hue}, 75%, 60%)`;
+      };
+      
+      const shouldFlash = (remaining) => {
+        const oneHour = 60 * 60 * 1000;
+        return remaining <= oneHour && remaining > 0;
+      };
+
+      const getRelativeBarWidth = (remaining) => {
+        const visibleTasks = tasks.filter(task => !task.showTime || currentTime >= task.showTime);
+        if (visibleTasks.length === 0) return 0;
+        
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        
+        const cappedRemaining = Math.min(remaining, oneWeek);
+        
+        const maxCappedTime = Math.max(...visibleTasks.map(t => {
+          const taskRemaining = t.deadline - currentTime;
+          return Math.min(taskRemaining > 0 ? taskRemaining : 0, oneWeek);
+        }));
+        
+        return Math.max(0, (cappedRemaining / maxCappedTime) * 100);
+      };
+
+      return (
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(180deg, #1a1410 0%, #2d1810 100%)',
+          color: '#fff',
+          fontFamily: '"Impact", "Arial Black", sans-serif',
+          padding: '20px', paddingBottom: showInstallBanner ? '140px' : '20px'
+        }}>
+          <style>{flashingStyle}</style>
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '40px',
+              padding: '20px', paddingBottom: showInstallBanner ? '140px' : '20px',
+              background: 'linear-gradient(180deg, rgba(255,100,0,0.3) 0%, rgba(200,50,0,0.2) 100%)',
+              border: '3px solid #ff6400',
+              borderRadius: '8px',
+              boxShadow: '0 0 20px rgba(255,100,0,0.5)'
+            }}>
+              <h1 style={{
+                fontSize: '48px',
+                margin: '0',
+                textTransform: 'uppercase',
+                color: '#ff6400',
+                textShadow: '3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
+              }}>
+                ACTIVE MISSIONS
+              </h1>
+            </div>
+
+            {/* Add Task Form */}
+            <div style={{
+              background: 'rgba(0,0,0,0.6)',
+              border: '2px solid #666',
+              borderRadius: '8px',
+              padding: '20px', paddingBottom: showInstallBanner ? '140px' : '20px',
+              marginBottom: '30px'
+            }}>
+              <h2 style={{
+                fontSize: '24px',
+                marginTop: '0',
+                marginBottom: '15px',
+                textTransform: 'uppercase',
+                color: '#ff6400'
+              }}>
+                <Plus size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />
+                New Mission
+              </h2>
+              
+              <input
+                type="text"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                placeholder="Mission objective..."
+                onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '16px',
+                  background: '#000',
+                  border: '2px solid #444',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  marginBottom: '15px',
+                  boxSizing: 'border-box'
+                }}
+              />
+              
+              {/* Mode Toggle */}
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                marginBottom: '15px',
+                background: '#000',
+                border: '2px solid #444',
+                borderRadius: '4px',
+                padding: '4px'
+              }}>
+                <button
+                  onClick={() => setInputMode('datetime')}
+                  style={{
+                    flex: 1,
+                    padding: '8px',
+                    background: inputMode === 'datetime' ? '#ff6400' : 'transparent',
+                    border: 'none',
+                    borderRadius: '2px',
+                    color: inputMode === 'datetime' ? '#fff' : '#aaa',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: '14px',
+                    textTransform: 'uppercase',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Date & Time
+                </button>
+                <button
+                  onClick={() => setInputMode('duration')}
+                  style={{
+                    flex: 1,
+                    padding: '8px',
+                    background: inputMode === 'duration' ? '#ff6400' : 'transparent',
+                    border: 'none',
+                    borderRadius: '2px',
+                    color: inputMode === 'duration' ? '#fff' : '#aaa',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: '14px',
+                    textTransform: 'uppercase',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Duration
+                </button>
+              </div>
+              
+              {/* Recurring Toggle */}
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '10px',
+                  cursor: 'pointer',
+                  color: '#aaa',
+                  fontSize: '14px'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={isRecurring}
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      cursor: 'pointer',
+                      accentColor: '#ff6400'
+                    }}
+                  />
+                  <span style={{ textTransform: 'uppercase', fontWeight: 'bold' }}>RECURRING MISSION</span>
+                </label>
+              </div>
+              
+              {/* Recurring Options */}
+              {isRecurring && (
+                <div style={{ 
+                  marginBottom: '15px',
+                  background: '#000',
+                  border: '2px solid #444',
+                  borderRadius: '4px',
+                  padding: '15px'
+                }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#aaa', textTransform: 'uppercase' }}>
+                    Repeat Every
+                  </label>
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                    <button
+                      onClick={() => setRecurringType('daily')}
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        background: recurringType === 'daily' ? '#ff6400' : 'transparent',
+                        border: '2px solid ' + (recurringType === 'daily' ? '#ff8833' : '#444'),
+                        borderRadius: '4px',
+                        color: recurringType === 'daily' ? '#fff' : '#aaa',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      Day
+                    </button>
+                    <button
+                      onClick={() => setRecurringType('weekly')}
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        background: recurringType === 'weekly' ? '#ff6400' : 'transparent',
+                        border: '2px solid ' + (recurringType === 'weekly' ? '#ff8833' : '#444'),
+                        borderRadius: '4px',
+                        color: recurringType === 'weekly' ? '#fff' : '#aaa',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      Week
+                    </button>
+                    <button
+                      onClick={() => setRecurringType('monthly')}
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        background: recurringType === 'monthly' ? '#ff6400' : 'transparent',
+                        border: '2px solid ' + (recurringType === 'monthly' ? '#ff8833' : '#444'),
+                        borderRadius: '4px',
+                        color: recurringType === 'monthly' ? '#fff' : '#aaa',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      Month
+                    </button>
+                  </div>
+                  
+                  {recurringType === 'weekly' && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#aaa', textTransform: 'uppercase' }}>
+                        On
+                      </label>
+                      <select
+                        value={recurringDay}
+                        onChange={(e) => setRecurringDay(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          fontSize: '14px',
+                          background: '#000',
+                          border: '2px solid #444',
+                          borderRadius: '4px',
+                          color: '#fff',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                      </select>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#aaa', textTransform: 'uppercase' }}>
+                      Show Task (Hours Before Deadline)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={leadTimeHours}
+                      onChange={(e) => setLeadTimeHours(e.target.value)}
+                      placeholder="4"
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        fontSize: '14px',
+                        background: '#000',
+                        border: '2px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff'
+                      }}
+                    />
+                    <p style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      margin: '5px 0 0 0',
+                      fontFamily: 'Arial, sans-serif'
+                    }}>
+                      Task will appear {leadTimeHours} hour{leadTimeHours !== '1' ? 's' : ''} before it's due
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {inputMode === 'datetime' ? (
+                <>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#aaa' }}>
+                      DUE DATE
+                    </label>
+                    <input
+                      type="date"
+                      value={newTaskDate}
+                      onChange={(e) => setNewTaskDate(e.target.value)}
+                      placeholder="Auto-fills if time set"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        fontSize: '16px',
+                        background: '#000',
+                        border: '2px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        boxSizing: 'border-box',
+                        colorScheme: 'dark'
+                      }}
+                    />
+                  </div>
+                  
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#aaa' }}>
+                      DUE TIME
+                    </label>
+                    <input
+                      type="time"
+                      value={newTaskTime}
+                      onChange={(e) => setNewTaskTime(e.target.value)}
+                      placeholder="Auto-fills 11:59 PM if date set"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        fontSize: '16px',
+                        background: '#000',
+                        border: '2px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        boxSizing: 'border-box',
+                        colorScheme: 'dark'
+                      }}
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={addTask}
+                    style={{
+                      padding: '12px 24px',
+                      fontSize: '18px',
+                      background: '#ff6400',
+                      border: '3px solid #ff8833',
+                      borderRadius: '4px',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 4px 0 #cc5000',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = '#ff7722'}
+                    onMouseOut={(e) => e.currentTarget.style.background = '#ff6400'}
+                  >
+                    Accept
+                  </button>
+                </div>
+                {newTaskTime && !newTaskDate && (
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: '#666', 
+                    margin: '5px 0 0 0',
+                    fontFamily: 'Arial, sans-serif',
+                    fontStyle: 'italic'
+                  }}>
+                    Date will auto-fill with {(() => {
+                      const now = new Date();
+                      const [hours, minutes] = newTaskTime.split(':').map(Number);
+                      const todayWithTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                      return todayWithTime <= now ? 'tomorrow' : 'today';
+                    })()} when you click Accept
+                  </p>
+                )}
+                {newTaskDate && !newTaskTime && (
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: '#666', 
+                    margin: '5px 0 0 0',
+                    fontFamily: 'Arial, sans-serif',
+                    fontStyle: 'italic'
+                  }}>
+                    Time will auto-fill with 11:59 PM when you click Accept
+                  </p>
+                )}
+                </>
+              ) : (
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#aaa' }}>
+                      HOURS
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newTaskHours}
+                      onChange={(e) => setNewTaskHours(e.target.value)}
+                      placeholder="0"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        fontSize: '16px',
+                        background: '#000',
+                        border: '2px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+                  
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#aaa' }}>
+                      MINUTES
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={newTaskMinutes}
+                      onChange={(e) => setNewTaskMinutes(e.target.value)}
+                      placeholder="0"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        fontSize: '16px',
+                        background: '#000',
+                        border: '2px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={addTask}
+                    style={{
+                      padding: '12px 24px',
+                      fontSize: '18px',
+                      background: '#ff6400',
+                      border: '3px solid #ff8833',
+                      borderRadius: '4px',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 4px 0 #cc5000',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = '#ff7722'}
+                    onMouseOut={(e) => e.currentTarget.style.background = '#ff6400'}
+                  >
+                    Accept
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Tasks List */}
+            <div>
+              {tasks.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '40px',
+                  background: 'rgba(0,0,0,0.4)',
+                  border: '2px dashed #444',
+                  borderRadius: '8px',
+                  color: '#888'
+                }}>
+                  <Clock size={48} style={{ marginBottom: '10px', opacity: 0.5 }} />
+                  <p style={{ fontSize: '18px', margin: 0 }}>NO ACTIVE MISSIONS</p>
+                </div>
+              ) : (
+                tasks
+                  .sort((a, b) => {
+                    const aActive = !a.showTime || currentTime >= a.showTime;
+                    const bActive = !b.showTime || currentTime >= b.showTime;
+                    
+                    if (aActive && !bActive) return -1;
+                    if (!aActive && bActive) return 1;
+                    
+                    return a.deadline - b.deadline;
+                  })
+                  .map((task, index, array) => {
+                    const isActive = !task.showTime || currentTime >= task.showTime;
+                    const timeLeft = getTimeRemaining(task.deadline);
+                    const isExpired = timeLeft.total <= 0;
+                    const barColor = isActive ? getBarColor(timeLeft.total) : '#444';
+                    const relativeBarWidth = isActive ? getRelativeBarWidth(timeLeft.total) : 0;
+                    const isFlashing = isActive && shouldFlash(timeLeft.total);
+                    
+                    const timeUntilActive = task.showTime ? getTimeRemaining(task.showTime) : null;
+                    
+                    const prevTask = index > 0 ? array[index - 1] : null;
+                    const prevIsActive = prevTask ? (!prevTask.showTime || currentTime >= prevTask.showTime) : true;
+                    const showInactiveSeparator = !isActive && prevIsActive;
+                  
+                  return (
+                    <React.Fragment key={task.id}>
+                      {showInactiveSeparator && (
+                        <div style={{
+                          marginTop: '30px',
+                          marginBottom: '20px',
+                          padding: '10px',
+                          background: 'rgba(0,0,0,0.4)',
+                          border: '2px solid #333',
+                          borderRadius: '4px',
+                          textAlign: 'center',
+                          color: '#666',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          textTransform: 'uppercase',
+                          letterSpacing: '2px'
+                        }}>
+                          <Clock size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }} />
+                          Scheduled Missions
+                        </div>
+                      )}
+                    <div
+                      style={{
+                        background: isActive ? (isExpired ? 'rgba(139,0,0,0.3)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.3)',
+                        border: `3px solid ${isActive ? (isExpired ? '#8b0000' : barColor) : '#333'}`,
+                        borderRadius: '8px',
+                        padding: '15px',
+                        marginBottom: '15px',
+                        position: 'relative',
+                        boxShadow: isActive ? (isExpired ? '0 0 15px rgba(255,0,0,0.5)' : `0 0 10px ${barColor}40`) : 'none',
+                        animation: isFlashing ? 'flash 1s infinite' : 'none'
+                      }}
+                    >
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'start',
+                        marginBottom: '10px'
+                      }}>
+                        <div style={{ flex: 1 }}>
+                          <h3 style={{
+                            fontSize: '22px',
+                            margin: 0,
+                            textTransform: 'uppercase',
+                            color: isActive ? (isExpired ? '#ff4444' : '#fff') : '#666',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            {isActive && isExpired && <AlertTriangle size={20} style={{ color: '#ff0000' }} />}
+                            {task.recurring && <Repeat size={18} style={{ color: isActive ? '#4ade80' : '#444' }} />}
+                            {task.name}
+                          </h3>
+                          {!isActive && timeUntilActive && (
+                            <div style={{
+                              fontSize: '12px',
+                              color: '#666',
+                              marginTop: '4px',
+                              textTransform: 'uppercase',
+                              letterSpacing: '1px'
+                            }}>
+                              INACTIVE • Activates in {timeUntilActive.hours > 0 ? `${timeUntilActive.hours}h ` : ''}{timeUntilActive.minutes}m
+                            </div>
+                          )}
+                          {isActive && task.recurring && (
+                            <div style={{
+                              fontSize: '12px',
+                              color: '#4ade80',
+                              marginTop: '4px',
+                              textTransform: 'uppercase',
+                              letterSpacing: '1px'
+                            }}>
+                              {task.recurring.type === 'daily' && 'Repeats Daily'}
+                              {task.recurring.type === 'weekly' && `Repeats Weekly on ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][task.recurring.day]}`}
+                              {task.recurring.type === 'monthly' && 'Repeats Monthly'}
+                              {task.recurring.leadTimeHours && ` • Shows ${task.recurring.leadTimeHours}h before`}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {task.recurring && isActive && (
+                            <button
+                              onClick={() => completeRecurringTask(task)}
+                              title="Complete and create next instance"
+                              style={{
+                                background: 'transparent',
+                                border: '2px solid #4ade80',
+                                borderRadius: '4px',
+                                color: '#4ade80',
+                                cursor: 'pointer',
+                                padding: '5px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.background = '#4ade80';
+                                e.currentTarget.style.color = '#000';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = '#4ade80';
+                              }}
+                            >
+                              <CheckCircle size={20} />
+                            </button>
+                          )}
+                          {isActive && (
+                            <button
+                              onClick={() => startEditingTask(task)}
+                              title="Edit deadline"
+                              style={{
+                                background: 'transparent',
+                                border: '2px solid #fbbf24',
+                                borderRadius: '4px',
+                                color: '#fbbf24',
+                                cursor: 'pointer',
+                                padding: '5px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.background = '#fbbf24';
+                                e.currentTarget.style.color = '#000';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = '#fbbf24';
+                              }}
+                            >
+                              <Edit2 size={20} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => removeTask(task.id)}
+                            title="Delete permanently"
+                            style={{
+                              background: 'transparent',
+                              border: '2px solid #666',
+                              borderRadius: '4px',
+                              color: '#999',
+                              cursor: 'pointer',
+                              padding: '5px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.background = '#ff4444';
+                              e.currentTarget.style.borderColor = '#ff6666';
+                              e.currentTarget.style.color = '#fff';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.borderColor = '#666';
+                              e.currentTarget.style.color = '#999';
+                            }}
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {editingTaskId === task.id ? (
+                        <div style={{
+                          background: 'rgba(251, 191, 36, 0.1)',
+                          border: '2px solid #fbbf24',
+                          borderRadius: '4px',
+                          padding: '15px',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{ 
+                            fontSize: '14px', 
+                            color: '#fbbf24', 
+                            marginBottom: '10px',
+                            textTransform: 'uppercase',
+                            fontWeight: 'bold'
+                          }}>
+                            Edit Deadline
+                          </div>
+                          
+                          <div style={{ 
+                            display: 'flex', 
+                            gap: '8px', 
+                            marginBottom: '10px',
+                            background: '#000',
+                            border: '2px solid #444',
+                            borderRadius: '4px',
+                            padding: '3px'
+                          }}>
+                            <button
+                              onClick={() => setEditMode('datetime')}
+                              style={{
+                                flex: 1,
+                                padding: '6px',
+                                background: editMode === 'datetime' ? '#fbbf24' : 'transparent',
+                                border: 'none',
+                                borderRadius: '2px',
+                                color: editMode === 'datetime' ? '#000' : '#aaa',
+                                cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                fontSize: '12px',
+                                textTransform: 'uppercase',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              Date & Time
+                            </button>
+                            <button
+                              onClick={() => setEditMode('duration')}
+                              style={{
+                                flex: 1,
+                                padding: '6px',
+                                background: editMode === 'duration' ? '#fbbf24' : 'transparent',
+                                border: 'none',
+                                borderRadius: '2px',
+                                color: editMode === 'duration' ? '#000' : '#aaa',
+                                cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                fontSize: '12px',
+                                textTransform: 'uppercase',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              Duration
+                            </button>
+                          </div>
+                          
+                          {editMode === 'datetime' ? (
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                              <input
+                                type="date"
+                                value={editDate}
+                                onChange={(e) => setEditDate(e.target.value)}
+                                style={{
+                                  flex: 1,
+                                  padding: '8px',
+                                  fontSize: '14px',
+                                  background: '#000',
+                                  border: '2px solid #444',
+                                  borderRadius: '4px',
+                                  color: '#fff',
+                                  colorScheme: 'dark'
+                                }}
+                              />
+                              <input
+                                type="time"
+                                value={editTime}
+                                onChange={(e) => setEditTime(e.target.value)}
+                                style={{
+                                  flex: 1,
+                                  padding: '8px',
+                                  fontSize: '14px',
+                                  background: '#000',
+                                  border: '2px solid #444',
+                                  borderRadius: '4px',
+                                  color: '#fff',
+                                  colorScheme: 'dark'
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                              <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#aaa' }}>
+                                  HOURS
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={editHours}
+                                  onChange={(e) => setEditHours(e.target.value)}
+                                  placeholder="0"
+                                  style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    fontSize: '14px',
+                                    background: '#000',
+                                    border: '2px solid #444',
+                                    borderRadius: '4px',
+                                    color: '#fff',
+                                    boxSizing: 'border-box'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#aaa' }}>
+                                  MINUTES
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="59"
+                                  value={editMinutes}
+                                  onChange={(e) => setEditMinutes(e.target.value)}
+                                  placeholder="0"
+                                  style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    fontSize: '14px',
+                                    background: '#000',
+                                    border: '2px solid #444',
+                                    borderRadius: '4px',
+                                    color: '#fff',
+                                    boxSizing: 'border-box'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => saveTaskEdit(task.id)}
+                              style={{
+                                flex: 1,
+                                padding: '8px',
+                                background: '#4ade80',
+                                border: '2px solid #22c55e',
+                                borderRadius: '4px',
+                                color: '#000',
+                                cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase'
+                              }}
+                              onMouseOver={(e) => e.currentTarget.style.background = '#22c55e'}
+                              onMouseOut={(e) => e.currentTarget.style.background = '#4ade80'}
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelTaskEdit}
+                              style={{
+                                flex: 1,
+                                padding: '8px',
+                                background: 'transparent',
+                                border: '2px solid #666',
+                                borderRadius: '4px',
+                                color: '#999',
+                                cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.borderColor = '#999';
+                                e.currentTarget.style.color = '#fff';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.borderColor = '#666';
+                                e.currentTarget.style.color = '#999';
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div style={{
+                            fontSize: '28px',
+                            fontWeight: 'bold',
+                            color: isActive ? (isExpired ? '#ff0000' : barColor) : '#444',
+                            marginBottom: '10px',
+                            fontFamily: '"Courier New", monospace',
+                            textShadow: `0 0 10px ${isActive ? (isExpired ? '#ff0000' : barColor) : '#444'}`,
+                            animation: isFlashing ? 'flash 1s infinite' : 'none'
+                          }}>
+                            {!isActive ? (
+                              'INACTIVE'
+                            ) : isExpired ? (
+                              'EXPIRED'
+                            ) : (
+                              `${String(timeLeft.hours).padStart(2, '0')}:${String(timeLeft.minutes).padStart(2, '0')}:${String(timeLeft.seconds).padStart(2, '0')}`
+                            )}
+                          </div>
+
+                          <div style={{
+                            width: '100%',
+                            height: '20px',
+                            background: '#111',
+                            border: '2px solid #333',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            position: 'relative'
+                          }}>
+                            <div style={{
+                              width: `${relativeBarWidth}%`,
+                              height: '100%',
+                              background: barColor,
+                              transition: 'width 0.3s ease-out, background-color 0.3s ease-out',
+                              boxShadow: `0 0 10px ${barColor}`,
+                              animation: isFlashing ? 'flash 1s infinite' : 'none'
+                            }} />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    </React.Fragment>
+                  );
+                })
+              )}
+            </div>
+          </div>
+          
+          {showInstallBanner && (
+            <InstallBanner onInstall={handleInstall} onDismiss={handleDismiss} />
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<DeadRisingTodo />, document.getElementById('root'));
+  </script>
+</body>
+</html>
